@@ -1,30 +1,22 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCryptos } from '../hooks/useCryptos';
-import { useCurrencyConversion } from '../hooks/useCurrencyConversion';
-import { formatZAR, formatZARMarketCap } from '../utils/formatters';
+import { useCryptoDetails } from '../hooks/useCryptoDetails';
 import styles from './CryptoDetails.module.css';
 
 const CryptoDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { cryptos, loading, error } = useCryptos({
-    priceChange: true,
-  });
-  const { 
-    convertUSDToZAR, 
-    zarRate, 
-    loading: ratesLoading, 
-    error: ratesError 
-  } = useCurrencyConversion();
+  const { crypto, loading, error, getCryptoById } = useCryptoDetails();
 
-  const isLoading = loading || ratesLoading;
-  const hasError = error || ratesError;
+  useEffect(() => {
+    if (id) {
+      getCryptoById(id);
+    }
+  }, [id]); // Only depend on id
 
-  // Find the specific cryptocurrency
-  const crypto = cryptos.find(c => c.id === id);
-
-  if (!id || (!isLoading && !crypto)) {
+  if (loading) return <div className={styles.loading}>Loading...</div>;
+  if (error) return <div className={styles.error}>{error}</div>;
+  if (!crypto) {
     return (
       <div className={styles.errorContainer}>
         <h2>Cryptocurrency not found</h2>
@@ -35,70 +27,94 @@ const CryptoDetails: React.FC = () => {
     );
   }
 
-  if (isLoading) return <div className={styles.loading}>Loading...</div>;
-  if (hasError) return <div className={styles.error}>{error || ratesError}</div>;
-
-  // Convert all values to ZAR
-  const zarPrice = convertUSDToZAR(crypto!.currentPrice);
-  const zarMarketCap = convertUSDToZAR(crypto!.marketCap);
-  const zar24hHigh = convertUSDToZAR(crypto!.high24h);
-  const zar24hLow = convertUSDToZAR(crypto!.low24h);
-  const zar24hChange = convertUSDToZAR(crypto!.priceChange24h);
-
   return (
     <div className={styles.container}>
       <button onClick={() => navigate('/')} className={styles.backButton}>
         &larr; Back to Dashboard
       </button>
-
+      {/* === Header === */}
       <div className={styles.header}>
         <div className={styles.coinHeader}>
-          <img 
-            src={crypto!.image} 
-            alt={crypto!.name} 
-            className={styles.coinImage}
-          />
-          <h1>{crypto!.name} ({crypto!.symbol.toUpperCase()})</h1>
+          <a href={crypto.blockchainSite} target="_blank" rel="noreferrer">
+        <img src={crypto.image} alt={crypto.name} className={styles.coinImage} />
+          </a>
+          <h1>
+        <a href={crypto.homepage} target="_blank" rel="noreferrer" className={styles.homepageLink}>
+          {crypto.name}
+        </a>{' '}
+        <a href={crypto.blockchainSite} target="_blank" rel="noreferrer" className={styles.homepageLink}>
+          ({crypto.symbol})
+        </a>
+          </h1>
         </div>
         <div className={styles.priceContainer}>
-          <h2>{zarPrice !== null ? formatZAR(zarPrice) : '-'}</h2>
-          <span className={zar24hChange && zar24hChange >= 0 ? styles.positive : styles.negative}>
-            {zar24hChange !== null ? crypto!.priceChangePercentage24h : '-'}
+          <h2>{crypto.formattedPrice}</h2>
+          <span className={crypto.priceChangePercentage24h >= 0 ? styles.positive : styles.negative}>
+        {crypto.formattedPriceChangePercentage}
           </span>
         </div>
       </div>
 
+      {/* === Grid Sections === */}
       <div className={styles.detailsGrid}>
+        {/* Market Data */}
         <div className={styles.detailCard}>
           <h3>Market Cap</h3>
-          <p>{zarMarketCap !== null ? formatZARMarketCap(zarMarketCap) : '-'}</p>
+          <p>{crypto.formattedMarketCap}</p>
         </div>
         <div className={styles.detailCard}>
-          <h3>24h Trading Volume</h3>
-          <p>{crypto!.totalVolume ? formatZARMarketCap(crypto!.totalVolume * zarRate!) : '-'}</p>
+          <h3>24h Volume</h3>
+          <p>{crypto.formattedTotalVolume}</p>
         </div>
         <div className={styles.detailCard}>
-          <h3>24h High</h3>
-          <p>{zar24hHigh !== null ? formatZAR(zar24hHigh) : '-'}</p>
+          <h3>24h High / Low</h3>
+          <p>
+            {crypto.formattedHigh24h} / {crypto.formattedLow24h}
+          </p>
         </div>
-        <div className={styles.detailCard}>
-          <h3>24h Low</h3>
-          <p>{zar24hLow !== null ? formatZAR(zar24hLow) : '-'}</p>
-        </div>
+
+        {/* Supply */}
         <div className={styles.detailCard}>
           <h3>Circulating Supply</h3>
-          <p>{crypto!.circulatingSupply?.toLocaleString() || '-'} {crypto!.symbol.toUpperCase()}</p>
+          <p>{crypto.formattedCirculatingSupply} {crypto.symbol}</p>
+        </div>
+
+        {/* ATH / ATL */}
+        <div className={styles.detailCard}>
+          <h3>All-Time High</h3>
+          <p>
+            {crypto.formattedATH}
+            <br /><small>on {crypto.athDate}</small>
+          </p>
         </div>
         <div className={styles.detailCard}>
-          <h3>All Time High</h3>
-          <p>{crypto!.ath ? formatZAR(crypto!.ath * zarRate!) : '-'}</p>
+          <h3>All-Time Low</h3>
+          <p>
+            {crypto.formattedATL}
+            <br /><small>on {crypto.atlDate}</small>
+          </p>
+        </div>
+
+        {/* Used to correct spacing as I desire */}
+        <div>
+
+        </div>
+
+        {/* Sentiment */}
+        <div className={styles.detailCard}>
+          <h3>Sentiment</h3>
+          <p>
+            Positive - {crypto.formattedUpVotesPercentage}<br />
+            Negative - {crypto.formattedDownVotesPercentage}
+          </p>
         </div>
       </div>
 
-      {crypto!.description && (
+      {/* === Description === */}
+      {crypto.description && (
         <div className={styles.description}>
-          <h3>About {crypto!.name}</h3>
-          <p>{crypto!.description}</p>
+          <h3>About {crypto.name}</h3>
+          <p>{crypto.description}</p>
         </div>
       )}
     </div>

@@ -1,24 +1,16 @@
-import { useCryptos } from '../hooks/useCryptos';
-import { useCurrencyConversion } from '../hooks/useCurrencyConversion';
-import { formatZAR, formatZARMarketCap } from '../utils/formatters';
+import { useCryptoLists } from '../hooks/useCryptoList';
+import { formatZAR } from '../utils/formatters';
 import { useNavigate } from 'react-router-dom';
 import styles from './Dashboard.module.css'; 
 
 const Dashboard: React.FC = () => {
-  const { cryptos, loading, error, lastUpdated } = useCryptos({
+  const { cryptos, loading, error, lastUpdated } = useCryptoLists({
     priceChange: true,
   });
   
-  const { 
-    convertUSDToZAR, 
-    zarRate, 
-    loading: ratesLoading, 
-    error: ratesError 
-  } = useCurrencyConversion();
-
   // Combine loading states
-  const isLoading = loading || ratesLoading;
-  const hasError = error || ratesError;
+  const isLoading = loading;
+  const hasError = error;
   const navigate = useNavigate();
 
   return (
@@ -27,18 +19,17 @@ const Dashboard: React.FC = () => {
       {lastUpdated && (
         <p className={styles.lastUpdated}>
           Last updated: {new Date(lastUpdated).toLocaleString()}
-          {zarRate && ` | Exchange rate: 1 USD = ${formatZAR(zarRate)}`}
         </p>
       )}
 
       {isLoading && <p>Loading cryptocurrency data...</p>}
       {hasError && (
         <p className={styles.error}>
-          {error || ratesError}
+          {error}
         </p>
       )}
 
-      {!isLoading && !hasError && zarRate && (
+      {!isLoading && !hasError && (
         <table className={styles.cryptoTable}>
           <thead>
             <tr>
@@ -51,37 +42,31 @@ const Dashboard: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {cryptos.map((coin) => {
-                const zarPrice = convertUSDToZAR(coin.currentPrice);
-                const zar24hChange = convertUSDToZAR(coin.priceChange24h);
-                const zarMarketCap = convertUSDToZAR(coin.marketCap * zarRate);
-              
-                return (
-                    <tr 
-                    key={coin.id} 
-                    onClick={() => navigate(`/crypto/${coin.id}`)} 
-                    className={styles.clickableRow}
-                    >
-                    <td>{coin.rank}</td>
-                    <td>
-                    <img 
-                        src={coin.image} 
-                        alt={coin.name} 
-                        className={styles.coinImage}
-                        loading="lazy"
-                    />
-                    </td>
-                    <td>
-                    {coin.name} ({coin.symbol.toUpperCase()})
-                    </td>
-                    <td>{zarPrice !== null ? formatZAR(zarPrice) : '-'}</td>
-                    <td className={(zar24hChange ?? 0) >= 0 ? styles.positive : styles.negative}>
-                    {zar24hChange !== null ? formatZAR(zar24hChange) : '-'}
-                    </td>
-                    <td>{zarMarketCap !== null ? formatZARMarketCap(zarMarketCap) : '-'}</td>
-                    </tr>
-              );
-            })}
+            {cryptos.map((coin) => (
+              <tr 
+                key={coin.id} 
+                onClick={() => navigate(`/crypto/${coin.id}`)} 
+                className={styles.clickableRow}
+              >
+                <td>{coin.rank}</td>
+                <td>
+                  <img 
+                    src={coin.image} 
+                    alt={coin.name} 
+                    className={styles.coinImage}
+                    loading="lazy"
+                  />
+                </td>
+                <td>
+                  {coin.name} ({coin.symbol.toUpperCase()})
+                </td>
+                <td>{formatZAR(coin.currentPrice)}</td>
+                <td className={coin.priceChange24h >= 0 ? styles.positive : styles.negative}>
+                  {formatZAR(coin.priceChange24h)}
+                </td>
+                <td>{formatZAR(coin.marketCap)}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       )}
