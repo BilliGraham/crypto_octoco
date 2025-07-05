@@ -17,6 +17,8 @@ export function useCurrencyConversion() {
   const [error, setError] = useState<string | null>(null);
   const [zarRate, setZarRate] = useState<number | null>(null);
 
+
+
   useEffect(() => {
     async function fetchRates() {
       setLoading(true);
@@ -37,7 +39,7 @@ export function useCurrencyConversion() {
         }
       } catch (err: any) {
         console.error('Exchange rate fetch error:', err);
-        setError(err.message || 'Unknown error');
+        setError(err.message ?? 'Unknown error');
       } finally {
         setLoading(false);
       }
@@ -48,6 +50,7 @@ export function useCurrencyConversion() {
 
   const convertUSDToZAR = (usdAmount: number): number | null => {
     if (!zarRate) return null;
+    console.log({ zarRate, usdAmount});
     return usdAmount * zarRate;
   };
 
