@@ -10,7 +10,6 @@ export const formatZAR = (zarAmount: number): string => {
   }).format(zarAmount);
 };
 
-
 // Format large numbers (market cap, volume)
 export const formatLargeNumber = (value: number): string => {
   return new Intl.NumberFormat('en-ZA', {
