@@ -12,10 +12,11 @@ const CryptoDetails: React.FC = () => {
     if (id) {
       getCryptoById(id);
     }
-  }, [id]); // Only depend on id
+  }, [id]);
 
   if (loading) return <div className={styles.loading}>Loading...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
+  
   if (!crypto) {
     return (
       <div className={styles.errorContainer}>
@@ -32,30 +33,31 @@ const CryptoDetails: React.FC = () => {
       <button onClick={() => navigate('/')} className={styles.backButton}>
         &larr; Back to Dashboard
       </button>
-      {/* === Header === */}
+
+      {/* Header */}
       <div className={styles.header}>
         <div className={styles.coinHeader}>
           <a href={crypto.blockchainSite} target="_blank" rel="noreferrer">
-        <img src={crypto.image} alt={crypto.name} className={styles.coinImage} />
+            <img src={crypto.image} alt={crypto.name} className={styles.coinImage} />
           </a>
           <h1>
-        <a href={crypto.homepage} target="_blank" rel="noreferrer" className={styles.homepageLink}>
-          {crypto.name}
-        </a>{' '}
-        <a href={crypto.blockchainSite} target="_blank" rel="noreferrer" className={styles.homepageLink}>
-          ({crypto.symbol})
-        </a>
+            <a href={crypto.homepage} target="_blank" rel="noreferrer" className={styles.homepageLink}>
+              {crypto.name}
+            </a>{' '}
+            <a href={crypto.blockchainSite} target="_blank" rel="noreferrer" className={styles.homepageLink}>
+              ({crypto.symbol})
+            </a>
           </h1>
         </div>
         <div className={styles.priceContainer}>
           <h2>{crypto.formattedPrice}</h2>
           <span className={crypto.priceChangePercentage24h >= 0 ? styles.positive : styles.negative}>
-        {crypto.formattedPriceChangePercentage}
+            {crypto.formattedPriceChangePercentage}
           </span>
         </div>
       </div>
 
-      {/* === Grid Sections === */}
+      {/* Grid Sections */}
       <div className={styles.detailsGrid}>
         {/* Market Data */}
         <div className={styles.detailCard}>
@@ -84,21 +86,21 @@ const CryptoDetails: React.FC = () => {
           <h3>All-Time High</h3>
           <p>
             {crypto.formattedATH}
-            <br /><small>on {crypto.athDate}</small>
+            <br />
+            <small>on {crypto.athDate}</small>
           </p>
         </div>
         <div className={styles.detailCard}>
           <h3>All-Time Low</h3>
           <p>
             {crypto.formattedATL}
-            <br /><small>on {crypto.atlDate}</small>
+            <br />
+            <small>on {crypto.atlDate}</small>
           </p>
         </div>
 
-        {/* Used to correct spacing as I desire */}
-        <div>
-
-        </div>
+        {/* Empty div for spacing */}
+        <div></div>
 
         {/* Sentiment */}
         <div className={styles.detailCard}>
@@ -110,7 +112,7 @@ const CryptoDetails: React.FC = () => {
         </div>
       </div>
 
-      {/* === Description === */}
+      {/* Description */}
       {crypto.description && (
         <div className={styles.description}>
           <h3>About {crypto.name}</h3>

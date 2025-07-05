@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { formatDate, formatZAR, formatLargeNumber, formatPercentage, formatSupply } from '../utils/formatters';
+import {
+  formatDate,
+  formatZAR,
+  formatLargeNumber,
+  formatPercentage,
+  formatSupply,
+} from '../utils/formatters';
 
 export interface CryptoData {
   id: string;
@@ -71,74 +77,79 @@ export function useCryptoDetails({ currency = 'zar' }: UseCryptoDetailsOptions =
     setError(null);
 
     try {
-      const res = await fetch(`https://api.coingecko.com/api/v3/coins/${id}`);
-      if (!res.ok) throw new Error(`Error ${res.status}`);
+      const response = await fetch(
+        `https://api.coingecko.com/api/v3/coins/${id}`
+      );
 
-      const data = await res.json();
-      const market = data.market_data;
-      const currentPrice = market.current_price[currency];
-      const priceChange24h = market.price_change_24h_in_currency[currency];
-      const priceChangePercentage24h = market.price_change_percentage_24h_in_currency[currency];
+      if (!response.ok) {
+        throw new Error(`Failed to fetch data: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const { market_data, image, links, description, sentiment_votes_up_percentage, sentiment_votes_down_percentage, last_updated } = data;
+      const currentCurrencyData = market_data.current_price[currency];
 
       const formattedData: CryptoData = {
         id: data.id,
         symbol: data.symbol.toUpperCase(),
         name: data.name,
-        image: data.image?.large ?? '',
+        image: image?.large ?? '',
         
         // Price data
-        currentPrice: currentPrice,
-        formattedPrice: formatZAR(currentPrice),
-        priceChange24h: priceChange24h,
-        formattedPriceChange: formatZAR(Math.abs(priceChange24h)),
-        priceChangePercentage24h: priceChangePercentage24h,
-        formattedPriceChangePercentage: formatPercentage(priceChangePercentage24h),
+        currentPrice: currentCurrencyData,
+        formattedPrice: formatZAR(currentCurrencyData),
+        priceChange24h: market_data.price_change_24h_in_currency[currency],
+        formattedPriceChange: formatZAR(Math.abs(market_data.price_change_24h_in_currency[currency])),
+        priceChangePercentage24h: market_data.price_change_percentage_24h_in_currency[currency],
+        formattedPriceChangePercentage: formatPercentage(
+          market_data.price_change_percentage_24h_in_currency[currency]
+        ),
         
         // Market data
-        marketCap: market.market_cap[currency],
-        formattedMarketCap: formatLargeNumber(market.market_cap[currency]),
-        totalVolume: market.total_volume[currency],
-        formattedTotalVolume: formatLargeNumber(market.total_volume[currency]),
-        marketCapRank: market.market_cap_rank,
+        marketCap: market_data.market_cap[currency],
+        formattedMarketCap: formatLargeNumber(market_data.market_cap[currency]),
+        totalVolume: market_data.total_volume[currency],
+        formattedTotalVolume: formatLargeNumber(market_data.total_volume[currency]),
+        marketCapRank: market_data.market_cap_rank,
         
         // 24h ranges
-        high24h: market.high_24h[currency],
-        formattedHigh24h: formatZAR(market.high_24h[currency]),
-        low24h: market.low_24h[currency],
-        formattedLow24h: formatZAR(market.low_24h[currency]),
+        high24h: market_data.high_24h[currency],
+        formattedHigh24h: formatZAR(market_data.high_24h[currency]),
+        low24h: market_data.low_24h[currency],
+        formattedLow24h: formatZAR(market_data.low_24h[currency]),
         
         // Supply
-        circulatingSupply: market.circulating_supply,
-        formattedCirculatingSupply: formatSupply(market.circulating_supply),
+        circulatingSupply: market_data.circulating_supply,
+        formattedCirculatingSupply: formatSupply(market_data.circulating_supply),
         
         // All-time highs/lows
-        ath: market.ath[currency],
-        formattedATH: formatZAR(market.ath[currency]),
-        athDate: formatDate(market.ath_date[currency]),
-        atl: market.atl[currency],
-        formattedATL: formatZAR(market.atl[currency]),
-        atlDate: formatDate(market.atl_date[currency]),
+        ath: market_data.ath[currency],
+        formattedATH: formatZAR(market_data.ath[currency]),
+        athDate: formatDate(market_data.ath_date[currency]),
+        atl: market_data.atl[currency],
+        formattedATL: formatZAR(market_data.atl[currency]),
+        atlDate: formatDate(market_data.atl_date[currency]),
         
         // Sentiment
-        upVotesPercentage: data.sentiment_votes_up_percentage ?? 0,
-        formattedUpVotesPercentage: formatPercentage(data.sentiment_votes_up_percentage ?? 0),
-        downVotesPercentage: data.sentiment_votes_down_percentage ?? 0,
-        formattedDownVotesPercentage: formatPercentage(data.sentiment_votes_down_percentage ?? 0),
+        upVotesPercentage: sentiment_votes_up_percentage ?? 0,
+        formattedUpVotesPercentage: formatPercentage(sentiment_votes_up_percentage ?? 0),
+        downVotesPercentage: sentiment_votes_down_percentage ?? 0,
+        formattedDownVotesPercentage: formatPercentage(sentiment_votes_down_percentage ?? 0),
         
         // Links
-        homepage: data.links.homepage?.[0] ?? '',
-        blockchainSite: data.links.blockchain_site?.[0] ?? '',
+        homepage: links.homepage?.[0] ?? '',
+        blockchainSite: links.blockchain_site?.[0] ?? '',
         
         // Description
-        description: data.description?.en ?? '',
+        description: description?.en ?? '',
         
         // Metadata
-        lastUpdated: data.last_updated,
+        lastUpdated: last_updated,
       };
 
       setCrypto(formattedData);
     } catch (err: any) {
-      setError(err.message ?? 'Failed to fetch crypto details');
+      setError(err.message ?? 'Failed to fetch cryptocurrency details');
       setCrypto(null);
     } finally {
       setLoading(false);

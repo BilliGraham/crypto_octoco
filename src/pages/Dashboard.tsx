@@ -1,14 +1,13 @@
 import { useCryptoLists } from '../hooks/useCryptoList';
 import { formatZAR } from '../utils/formatters';
 import { useNavigate } from 'react-router-dom';
-import styles from './Dashboard.module.css'; 
+import styles from './Dashboard.module.css';
 
 const Dashboard: React.FC = () => {
   const { cryptos, loading, error, lastUpdated } = useCryptoLists({
     priceChange: true,
   });
-  
-  // Combine loading states
+
   const isLoading = loading;
   const hasError = error;
   const navigate = useNavigate();
@@ -16,6 +15,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className={styles.dashboard}>
       <h1>Top 10 Cryptocurrencies</h1>
+      
       {lastUpdated && (
         <p className={styles.lastUpdated}>
           Last updated: {new Date(lastUpdated).toLocaleString()}
@@ -23,11 +23,7 @@ const Dashboard: React.FC = () => {
       )}
 
       {isLoading && <p>Loading cryptocurrency data...</p>}
-      {hasError && (
-        <p className={styles.error}>
-          {error}
-        </p>
-      )}
+      {hasError && <p className={styles.error}>{error}</p>}
 
       {!isLoading && !hasError && (
         <table className={styles.cryptoTable}>
@@ -43,16 +39,16 @@ const Dashboard: React.FC = () => {
           </thead>
           <tbody>
             {cryptos.map((coin) => (
-              <tr 
-                key={coin.id} 
-                onClick={() => navigate(`/crypto/${coin.id}`)} 
+              <tr
+                key={coin.id}
+                onClick={() => navigate(`/crypto/${coin.id}`)}
                 className={styles.clickableRow}
               >
                 <td>{coin.rank}</td>
                 <td>
-                  <img 
-                    src={coin.image} 
-                    alt={coin.name} 
+                  <img
+                    src={coin.image}
+                    alt={coin.name}
                     className={styles.coinImage}
                     loading="lazy"
                   />
