@@ -10,24 +10,32 @@ export const formatZAR = (zarAmount: number): string => {
   }).format(zarAmount);
 };
 
-/**
- * Formats large numbers (like market caps) with ZAR symbol and 2 decimals
- */
-export const formatZARMarketCap = (zarAmount: number): string => {
-    return new Intl.NumberFormat('en-ZA', {
-        style: 'currency',
-        currency: 'ZAR',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    }).format(zarAmount);
+
+// Format large numbers (market cap, volume)
+export const formatLargeNumber = (value: number): string => {
+  return new Intl.NumberFormat('en-ZA', {
+    style: 'currency',
+    currency: 'ZAR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(value);
 };
 
-/**
- * Combined utility that converts USD to ZAR and formats it
- * Rounds to 2 decimal places before formatting
- */
-export const formatUSDToZAR = (usdAmount: number, zarRate: number | null): string => {
-    if (!zarRate) return 'Loading...';
-    const zarAmount = Math.round(usdAmount * zarRate * 100) / 100;
-    return formatZAR(zarAmount);
+// Format supply numbers
+export const formatSupply = (value: number): string => {
+  return new Intl.NumberFormat('en-ZA', {
+    maximumFractionDigits: 0
+  }).format(value);
 };
+
+// Format percentage changes
+export const formatPercentage = (value: number): string => {
+  return `${value.toFixed(2)}%`;
+};
+
+// Format date
+export const formatDate = (dateString: string): string => {
+  return new Date(dateString).toLocaleDateString();
+};
+
+
