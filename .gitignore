@@ -75,7 +75,7 @@ jspm_packages/
 # Optional REPL history
 .node_repl_history
 
-# Lock files (check with your team whether to include these)
+# Lock files 
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
