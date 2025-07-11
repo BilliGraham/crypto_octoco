@@ -20,6 +20,22 @@ export function useCurrencyConversion() {
 
 
   useEffect(() => {
+    /**
+     * Fetches the latest currency exchange rates from the API and updates local state.
+     *
+     * - Sets loading state to `true` while fetching.
+     * - Clears any previous error state.
+     * - On success:
+     *   - Updates the rates state with the fetched exchange rates.
+     *   - Stores the ZAR (South African Rand) rate separately for quick access if available.
+     * - On failure:
+     *   - Logs the error to the console.
+     *   - Updates the error state with the error message.
+     * - Always sets loading state to `false` after completion.
+     *
+     * @async
+     * @throws {Error} If the fetch request fails or the response is not OK.
+     */
     async function fetchRates() {
       setLoading(true);
       setError(null);
@@ -48,6 +64,12 @@ export function useCurrencyConversion() {
     fetchRates();
   }, []);
 
+  /**
+   * Converts a given amount in USD to ZAR using the current exchange rate.
+   *
+   * @param usdAmount - The amount in US Dollars to convert.
+   * @returns The equivalent amount in South African Rand (ZAR), or `null` if the exchange rate is unavailable.
+   */
   const convertUSDToZAR = (usdAmount: number): number | null => {
     if (!zarRate) return null;
     console.log({ zarRate, usdAmount});

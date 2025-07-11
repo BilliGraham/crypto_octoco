@@ -57,6 +57,27 @@ interface UseCryptoListsOptions {
   detailed?: boolean;
 }
 
+/**
+ * Custom React hook to fetch and manage a list of cryptocurrencies from the CoinGecko API.
+ *
+ * @param options - Configuration options for fetching the crypto list.
+ * @param options.currency - The fiat currency to display prices in (default: 'zar').
+ * @param options.limit - The maximum number of cryptocurrencies to fetch (default: 10).
+ * @param options.priceChange - Whether to include price change data (default: false).
+ * @param options.detailed - Whether to fetch detailed information for each cryptocurrency (default: false).
+ *
+ * @returns An object containing:
+ * - `cryptos`: Array of formatted cryptocurrency data.
+ * - `loading`: Boolean indicating if data is currently being fetched.
+ * - `error`: Error message if fetching fails, otherwise `null`.
+ * - `lastUpdated`: ISO string of the last successful data fetch.
+ * - `refresh`: Function to manually refresh the cryptocurrency data.
+ *
+ * @remarks
+ * - Fetches market data and, optionally, detailed data for each cryptocurrency.
+ * - Handles loading and error states.
+ * - Aborts fetch requests on component unmount or refresh.
+ */
 export function useCryptoLists({
   currency = 'zar',
   limit = 10,

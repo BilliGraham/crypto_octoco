@@ -3,6 +3,23 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useCryptoDetails } from '../hooks/useCryptoDetails';
 import styles from './CryptoDetails.module.css';
 
+/**
+ * Displays detailed information about a specific cryptocurrency.
+ *
+ * Fetches and renders data such as price, market cap, volume, supply, all-time high/low,
+ * sentiment, and description for the cryptocurrency identified by the `id` route parameter.
+ * Handles loading and error states, and provides navigation back to the dashboard.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered crypto details page.
+ *
+ * @remarks
+ * - Uses `useParams` to get the crypto ID from the route.
+ * - Uses a custom hook `useCryptoDetails` to fetch and manage crypto data.
+ * - Displays a loading indicator, error message, or the crypto details based on state.
+ * - Includes links to the crypto's homepage and blockchain site.
+ * - Applies various styles from the `styles` module.
+ */
 const CryptoDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -41,6 +58,7 @@ const CryptoDetails: React.FC = () => {
             <img src={crypto.image} alt={crypto.name} className={styles.coinImage} />
           </a>
           <h1>
+            <span className={styles.rank}>#{crypto.marketCapRank}</span>{' '}
             <a href={crypto.homepage} target="_blank" rel="noreferrer" className={styles.homepageLink}>
               {crypto.name}
             </a>{' '}

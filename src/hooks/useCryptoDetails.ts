@@ -67,6 +67,25 @@ interface UseCryptoDetailsOptions {
   currency?: string;
 }
 
+/**
+ * Custom React hook to fetch and manage detailed information about a cryptocurrency from the CoinGecko API.
+ *
+ * @param options - Options for fetching crypto details.
+ * @param options.currency - The currency code to use for price and market data (default: 'zar').
+ * @returns An object containing:
+ * - `crypto`: The fetched and formatted cryptocurrency data, or `null` if not loaded.
+ * - `loading`: Boolean indicating if the data is currently being fetched.
+ * - `error`: Error message if the fetch failed, or `null` if no error.
+ * - `getCryptoById`: Async function to fetch details for a cryptocurrency by its CoinGecko ID.
+ *
+ * @example
+ * ```tsx
+ * const { crypto, loading, error, getCryptoById } = useCryptoDetails({ currency: 'usd' });
+ * useEffect(() => {
+ *   getCryptoById('bitcoin');
+ * }, []);
+ * ```
+ */
 export function useCryptoDetails({ currency = 'zar' }: UseCryptoDetailsOptions = {}) {
   const [crypto, setCrypto] = useState<CryptoData | null>(null);
   const [loading, setLoading] = useState(true);
