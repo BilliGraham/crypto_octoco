@@ -1,5 +1,4 @@
 # Cryptocurrency_Price
-# Crypto Price Tracker - Octoco React Coding Test
 
 ## Overview
 
